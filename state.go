@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"fmt"
 )
 
@@ -27,8 +28,6 @@ type State struct {
 	Moves          []string
 	RemainingMoves int
 	Clusters       ClusterList
-
-	Targets []Point
 }
 
 // Given we only have a limited number of moves, calculate the distance
@@ -78,4 +77,39 @@ func (s *State) GetTargets() {
 			fmt.Printf("Target pickaxe: %v\n", v)
 		}
 	}
+}
+
+func (s *State) Cost(to Point) int {
+	item := s.ItemAt(to)
+	if item.IsEmpty() {
+		// TODO: Test and see how this affects points
+		return 2
+	}
+	return 1
+}
+
+func (s *State) travelTo(target Point) {
+	var current Point
+
+	queue := Queue{}
+	queue.Push(s.Start)
+	costs := map[Point]int{}
+
+	for queue.Len() > 0 {
+		current = queue.Pop().(Point)
+		if current == target {
+			break
+		}
+
+		neighbours := current.Expand()
+		for _, v := range neighbours {
+			if !s.IsPointValid(v) {
+				continue
+			}
+
+			// heap.Push(queue, v)
+		}
+	}
+
+	// done
 }
