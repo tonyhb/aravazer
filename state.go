@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 // State stores the state of the current challenge, moving our character
@@ -37,7 +36,7 @@ type State struct {
 // how many moves we have remaining, then plan if we can pick up any
 // axes.
 func (s *State) GetTargets() {
-	var currentCluster Cluster
+	var targetCluster Cluster
 	var score, distance int
 
 	for _, cluster := range s.Clusters {
@@ -50,15 +49,33 @@ func (s *State) GetTargets() {
 		}
 
 		if cluster.Score() > score {
-			currentCluster = cluster
+			targetCluster = cluster
 			score = cluster.Score()
 			distance = dist
 		}
 	}
 
-	// This cluster is our target.
-	fmt.Println(currentCluster, score, distance)
+	fmt.Printf("Cluster: %v\n", targetCluster)
+	fmt.Println(targetCluster.CalculateCenter())
 
 	// Figure out if there are any pickaxes nearby.
+	distance = 0
+	for _, v := range s.PickaxePoints {
+		// If this pickaxe is in our target cluster we'll circle back to it.
+		if targetCluster.Contains(s.ItemAt(v)) {
+			fmt.Printf("Pickaxe in target cluster at %v; skipping\n", v)
+			continue
+		}
 
+		// Attempt to find the closest pickaxe to the cluster that we can get
+		// en-route.
+
+		// TODO: We could probably cluster pickaxes together and attack clusters
+		// of pickaxes here.
+		dist := v.ManhattanDistance(s.Start) + targetCluster.CalculateCenter().ManhattanDistance(v)
+		if distance == 0 || dist < distance {
+			distance = dist
+			fmt.Printf("Target pickaxe: %v\n", v)
+		}
+	}
 }
