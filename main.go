@@ -15,11 +15,18 @@ func main() {
 	c.Moves = 11
 
 	state := State{
-		Challenge:      c,
-		CurrentPoint:   c.Start,
-		RemainingMoves: c.Moves,
-		Clusters:       c.Cluster(),
+		Challenge: c,
+		Clusters:  c.Cluster(),
 	}
 
-	state.GetTargets()
+	state.
+		GetTargets().
+		WalkToPickaxe().
+		ConsumeClusters().
+		LimitMoves()
+
+	points := state.Points()
+	moves := state.Moves()
+
+	fmt.Println(moves, points)
 }

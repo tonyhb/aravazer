@@ -85,11 +85,10 @@ func (p *Pathfinder) AStar() []Point {
 	path := []Point{current}
 	for current != p.From {
 		current = p.List[current]
-		fmt.Println(current)
 		path = append(path, current)
 	}
 
-	return path
+	return p.ReversePoints(path)
 }
 
 // Greedy takes the nearest neighbours of the current point and chooses a path
@@ -154,11 +153,18 @@ func (p *Pathfinder) Greedy() []Point {
 	path := []Point{current}
 	for current != p.From {
 		current = p.List[current]
-		fmt.Println(current)
 		path = append(path, current)
 	}
 
-	return path
+	return p.ReversePoints(path)
+}
+
+func (Pathfinder) ReversePoints(points []Point) []Point {
+	result := make([]Point, len(points), len(points))
+	for i, v := range points {
+		result[len(points)-i-1] = v
+	}
+	return result
 }
 
 func (p *Pathfinder) Score(to Point) int {
