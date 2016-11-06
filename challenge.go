@@ -5,12 +5,12 @@ import (
 )
 
 type Challenge struct {
-	Encoded string
-	Layout  [][]Item // row (y) * column (x) grid
-	Start   Point
-	Width   int
-	Height  int
-	Moves   int
+	Layout        string
+	DecodedLayout [][]Item // row (y) * column (x) grid
+	Start         Point
+	Width         int
+	Height        int
+	Moves         int
 
 	// Here we're going to store some basic information used for optimizing our
 	// algorithm. We're going to attempt to find the shortest path to a pickaxe
@@ -21,22 +21,22 @@ type Challenge struct {
 
 func NewChallenge(layout string) *Challenge {
 	c := &Challenge{
-		Encoded:       layout,
+		Layout:        layout,
 		PickaxePoints: []Point{},
 	}
-	c.parseEncoded()
+	c.ParseEncoded()
 	return c
 }
 
-func (c *Challenge) parseEncoded() {
-	rows := strings.Split(c.Encoded, ",")
+func (c *Challenge) ParseEncoded() {
+	rows := strings.Split(c.Layout, ",")
 
 	c.Width = len(rows[0])
 	c.Height = len(rows)
-	c.Layout = make([][]Item, c.Height, c.Height)
+	c.DecodedLayout = make([][]Item, c.Height, c.Height)
 
 	for i := range rows {
-		c.Layout[i] = c.parseRow(rows[i], i)
+		c.DecodedLayout[i] = c.parseRow(rows[i], i)
 	}
 }
 
@@ -60,8 +60,8 @@ func (c *Challenge) parseRow(row string, y int) []Item {
 
 // WalkFrom is used to do a point-by-point scan of the Challenge
 func (c *Challenge) Scan(ingester func(next Item)) {
-	for y := range c.Layout {
-		for _, item := range c.Layout[y] {
+	for y := range c.DecodedLayout {
+		for _, item := range c.DecodedLayout[y] {
 			ingester(item)
 		}
 	}
@@ -78,7 +78,7 @@ func (c *Challenge) IsPointValid(p Point) bool {
 }
 
 func (c *Challenge) ItemAt(p Point) Item {
-	return c.Layout[p.Y][p.X]
+	return c.DecodedLayout[p.Y][p.X]
 }
 
 func (c *Challenge) Cluster() ClusterList {

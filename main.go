@@ -1,27 +1,55 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"flag"
 	"fmt"
-	"time"
+	"os"
+	"strings"
 )
 
 var (
-	_ = fmt.Println
-	_ = time.Second
+	data string
+	_    = fmt.Println
 )
 
-func main() {
-	c := NewChallenge(".2.1.33.s.7.p,.7.71.6.2.63.,3551...9.....,.745668.7.2..,5..45...p..4.,8..4p.529..99,85...2.5....9,..1..69.....3,28.16p1.83.5.,2....7.....9.,.1.p.......58,.pp3...p5..61,...2...6p.769,....3.7.633.p,.......585..5")
-	c.Moves = 11
+func init() {
+	flag.StringVar(&data, "data", "", "challenge data base64 encoded")
+}
 
-	state := NewState(c)
-	path := state.
-		GetTargets().
-		WalkToPickaxe().
-		ConsumeClusters().
-		LimitMoves()
-	points, moves := result(c, path)
-	fmt.Println(moves, points)
+func main() {
+	flag.Parse()
+	data, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		fmt.Println("error decoding base64:", err)
+		os.Exit(1)
+	}
+
+	challenges := []*Challenge{}
+	if err = json.Unmarshal(data, &challenges); err != nil {
+		fmt.Println("error decoding challenge json:", err)
+		os.Exit(1)
+	}
+
+	var solutions = []string{}
+	var total int
+	for _, c := range challenges {
+		c.ParseEncoded()
+		state := NewState(c)
+		path := state.
+			GetTargets().
+			WalkToPickaxe().
+			ConsumeClusters().
+			LimitMoves()
+
+		points, moves := result(c, path)
+		solutions = append(solutions, strings.Join(moves, ""))
+		total += points
+	}
+
+	fmt.Println("Points:", total)
+	fmt.Println("Solutions:", strings.Join(solutions, ","))
 }
 
 func result(c *Challenge, path []Point) (int, []string) {

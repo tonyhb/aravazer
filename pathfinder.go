@@ -2,7 +2,6 @@ package main
 
 import (
 	"container/heap"
-	"fmt"
 )
 
 type Pathfinder struct {
@@ -36,7 +35,6 @@ func NewPathfinder(from, to Point, visited []Point, c *Challenge) *Pathfinder {
 
 func (p *Pathfinder) AStar() []Point {
 	var current Point
-	fmt.Println("Travelling from ", p.From, " to ", p.To)
 
 	// Pathfind
 	for p.Queue.Len() > 0 {
@@ -95,7 +93,6 @@ func (p *Pathfinder) AStar() []Point {
 // which nets the most points. It does not necessarily choose the shortest path,
 // though it is directional.
 func (p *Pathfinder) Greedy() []Point {
-	fmt.Println("Travelling from ", p.From, " to ", p.To)
 	var current Point
 
 	// Pathfind

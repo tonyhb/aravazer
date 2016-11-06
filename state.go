@@ -2,7 +2,6 @@ package main
 
 import (
 	"container/heap"
-	"fmt"
 )
 
 // State stores the state of the current challenge, moving our character
@@ -71,7 +70,6 @@ func (s *State) GetTargets() *State {
 	for _, v := range s.PickaxePoints {
 		// If this pickaxe is in our target cluster we'll circle back to it.
 		if targetCluster.Contains(s.ItemAt(v)) {
-			fmt.Printf("Pickaxe in target cluster at %v; skipping\n", v)
 			continue
 		}
 
@@ -82,7 +80,6 @@ func (s *State) GetTargets() *State {
 		dist := v.ManhattanDistance(s.Start) + targetCluster.CalculateCenter().ManhattanDistance(v)
 		if distance == 0 || dist < distance {
 			distance = dist
-			fmt.Printf("Target pickaxe: %v\n", v)
 			copy := v
 			target = &copy
 		}
