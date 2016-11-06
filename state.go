@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"fmt"
 )
 
@@ -27,7 +26,10 @@ type State struct {
 	CurrentPoint   Point
 	Moves          []string
 	RemainingMoves int
-	Clusters       ClusterList
+	// Pickaxes is a multiplier on the value of each square picked up
+	Pickaxes int
+	Points   int
+	Clusters ClusterList
 }
 
 // Given we only have a limited number of moves, calculate the distance
@@ -54,11 +56,9 @@ func (s *State) GetTargets() {
 		}
 	}
 
-	fmt.Printf("Cluster: %v\n", targetCluster)
-	fmt.Println(targetCluster.CalculateCenter())
-
 	// Figure out if there are any pickaxes nearby.
 	distance = 0
+	var target Point
 	for _, v := range s.PickaxePoints {
 		// If this pickaxe is in our target cluster we'll circle back to it.
 		if targetCluster.Contains(s.ItemAt(v)) {
@@ -75,41 +75,13 @@ func (s *State) GetTargets() {
 		if distance == 0 || dist < distance {
 			distance = dist
 			fmt.Printf("Target pickaxe: %v\n", v)
-		}
-	}
-}
+			target = v
 
-func (s *State) Cost(to Point) int {
-	item := s.ItemAt(to)
-	if item.IsEmpty() {
-		// TODO: Test and see how this affects points
-		return 2
-	}
-	return 1
-}
-
-func (s *State) travelTo(target Point) {
-	var current Point
-
-	queue := Queue{}
-	queue.Push(s.Start)
-	costs := map[Point]int{}
-
-	for queue.Len() > 0 {
-		current = queue.Pop().(Point)
-		if current == target {
-			break
-		}
-
-		neighbours := current.Expand()
-		for _, v := range neighbours {
-			if !s.IsPointValid(v) {
-				continue
-			}
-
-			// heap.Push(queue, v)
 		}
 	}
 
-	// done
+	_ = target
+
+	pathfinder := NewPathfinder(s.Start, target, []Point{}, s.Challenge)
+	pathfinder.Greedy()
 }

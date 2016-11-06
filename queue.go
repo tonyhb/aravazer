@@ -1,11 +1,7 @@
 package main
 
-import (
-	"container/heap"
-)
-
 type Member struct {
-	Point    Point
+	Item     interface{}
 	Priority int
 	Index    int
 }
@@ -17,6 +13,10 @@ func (q Queue) Len() int {
 }
 
 func (q Queue) Less(i, j int) bool {
+	// In our queue we prioritize points based on the benefit of moving to them
+	// as detected by our heuristic in state.go.  The larger this number the
+	// greater the priority, therefore ensure i is greater than J to pop the
+	// higher priority from the beginning of the queue.
 	return q[i].Priority > q[j].Priority
 }
 
@@ -35,15 +35,8 @@ func (q *Queue) Push(i interface{}) {
 
 func (q *Queue) Pop() interface{} {
 	old := *q
-	n := len(old)
-	member := old[n-1]
+	member := old[0]
 	member.Index = -1
-	*q = old[0 : n-1]
+	*q = old[1:]
 	return member
-}
-
-func (q *Queue) update(member *Member, point Point, priority int) {
-	member.Point = point
-	member.Priority = priority
-	heap.Fix(q, member.Index)
 }
