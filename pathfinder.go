@@ -15,7 +15,7 @@ type Pathfinder struct {
 	To   Point
 }
 
-func NewPathfinder(from, to Point, visited []Point, c *Challenge) Pathfinder {
+func NewPathfinder(from, to Point, visited []Point, c *Challenge) *Pathfinder {
 	list := map[Point]Point{}
 	for _, v := range visited {
 		list[v] = Point{}
@@ -24,7 +24,7 @@ func NewPathfinder(from, to Point, visited []Point, c *Challenge) Pathfinder {
 	queue := &Queue{&Member{from, 0, 0}}
 	heap.Init(queue)
 
-	return Pathfinder{
+	return &Pathfinder{
 		Queue:     queue,
 		List:      list,
 		Scores:    map[Point]int{from: 0},

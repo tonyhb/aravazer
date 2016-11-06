@@ -27,6 +27,15 @@ type State struct {
 
 	clusterQueue  *Queue
 	targetPickaxe *Point
+	path          []Point
+}
+
+func NewState(c *Challenge) *State {
+	return &State{
+		Challenge: c,
+		Clusters:  c.Cluster(),
+		path:      []Point{},
+	}
 }
 
 // Given we only have a limited number of moves, calculate the distance
@@ -84,20 +93,33 @@ func (s *State) GetTargets() *State {
 }
 
 func (s *State) WalkToPickaxe() *State {
+	if s.targetPickaxe == nil {
+		return s
+	}
+	s.path = NewPathfinder(s.Start, *s.targetPickaxe, []Point{}, s.Challenge).AStar()
 	return s
 }
 
 func (s *State) ConsumeClusters() *State {
+	start := s.Start
+	if len(s.path) > 0 {
+		start = s.path[len(s.path)-1]
+	}
+
+	for len(s.path) < s.Challenge.Moves {
+		cluster := s.clusterQueue.Pop().(*Member).Item.(Cluster)
+		path := NewPathfinder(start, cluster.CalculateCenter(), s.path, s.Challenge).Greedy()[1:]
+		s.path = append(s.path, path...)
+		// Reset our starter so we start from where we last left off
+		start = s.path[len(s.path)-1]
+	}
+
 	return s
 }
 
-func (s *State) LimitMoves() {
-}
-
-func (s *State) Points() int {
-	return 0
-}
-
-func (s *State) Moves() []string {
-	return []string{}
+func (s *State) LimitMoves() []Point {
+	if len(s.path) < s.Challenge.Moves+1 {
+		return s.path
+	}
+	return s.path[0:s.Challenge.Moves]
 }
