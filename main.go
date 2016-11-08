@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -20,14 +21,16 @@ func init() {
 
 func main() {
 	flag.Parse()
-	data, err := base64.StdEncoding.DecodeString(data)
+	re := regexp.MustCompile(`\\n`)
+	byt := re.ReplaceAll([]byte(data), []byte{})
+	byt, err := base64.StdEncoding.DecodeString(string(byt))
 	if err != nil {
 		fmt.Println("error decoding base64:", err)
 		os.Exit(1)
 	}
 
 	challenges := []*Challenge{}
-	if err = json.Unmarshal(data, &challenges); err != nil {
+	if err = json.Unmarshal(byt, &challenges); err != nil {
 		fmt.Println("error decoding challenge json:", err)
 		os.Exit(1)
 	}
