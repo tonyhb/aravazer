@@ -105,7 +105,10 @@ func (c *Challenge) Cluster() ClusterList {
 			cluster := NewCluster()
 			cluster.Add(curr)
 			expandCluster(c, cluster, curr)
-			clusters = append(clusters, *cluster)
+
+			if len(cluster.Items) > 1 {
+				clusters = append(clusters, *cluster)
+			}
 		}
 	})
 

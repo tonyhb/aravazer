@@ -37,9 +37,12 @@ func main() {
 
 	var solutions = []string{}
 	var total int
-	for _, c := range challenges {
+	for i, c := range challenges {
 		c.ParseEncoded()
 		state := NewState(c)
+
+		fmt.Printf("Attempting challenge %d\n", i+1)
+
 		path := state.
 			GetTargets().
 			WalkToPickaxe().
@@ -51,7 +54,7 @@ func main() {
 		total += points
 	}
 
-	fmt.Println("Points:", total)
+	fmt.Println("\nPoints:", total)
 	fmt.Println("Solutions:", strings.Join(solutions, ","))
 }
 

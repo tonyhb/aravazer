@@ -44,7 +44,6 @@ func NewState(c *Challenge) *State {
 func (s *State) GetTargets() *State {
 	var targetCluster Cluster
 	var score, distance int
-
 	// Add our clusters to a priority queue
 	s.clusterQueue = &Queue{}
 	for _, cluster := range s.Clusters {
@@ -103,9 +102,9 @@ func (s *State) ConsumeClusters() *State {
 		start = s.path[len(s.path)-1]
 	}
 
-	for len(s.path) < s.Challenge.Moves {
+	for len(s.path) < s.Challenge.Moves && s.clusterQueue.Len() > 0 {
 		cluster := s.clusterQueue.Pop().(*Member).Item.(Cluster)
-		path := NewPathfinder(start, cluster.CalculateCenter(), s.path, s.Challenge).Greedy()[1:]
+		path := NewPathfinder(start, cluster.CalculateCenter(), s.path, s.Challenge).AStar()[1:]
 		s.path = append(s.path, path...)
 		// Reset our starter so we start from where we last left off
 		start = s.path[len(s.path)-1]

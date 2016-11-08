@@ -41,7 +41,15 @@ func (c *Cluster) CalculateCenter() Point {
 		x += v.X
 		y += v.Y
 	}
-	c.center = Point{x / len(c.Items), y / len(c.Items)}
+
+	if x > 0 {
+		x = x / len(c.Items)
+	}
+	if y > 0 {
+		y = y / len(c.Items)
+	}
+
+	c.center = Point{x, y}
 	return c.center
 }
 
